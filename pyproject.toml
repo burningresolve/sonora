@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sonora"
-version = "1.0.1"
+version = "1.0.2"
 description = "A lightweight command-line YouTube playlist audio player"
 readme = "README.md"
 license = "MIT"

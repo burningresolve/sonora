@@ -95,7 +95,7 @@ automatically disabled when the output is not a terminal, when the
 While playing, one status line is redrawn in place once per second:
 
 ```
-playing | 01:23/03:45 | 3/12 | Track title | Channel | Playlist | vol 80%
+playing | 01:23/03:45 | 3/12 | Track title
 ```
 
 For piped streams some metadata may be unavailable until MPV has demuxed the

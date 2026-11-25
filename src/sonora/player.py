@@ -63,15 +63,13 @@ def run(playlist: dict, start: int) -> None:
     """Play the playlist from `start` until the end or a quit key."""
     tracks = playlist["tracks"]
     index = start
-    print(colors.accent(f"playing: {playlist['name']}"))
 
     with Terminal():
         while 0 <= index < len(tracks):
             track = tracks[index]
             try:
                 with Pipeline(track["id"]) as pipe:
-                    action = _run_track(pipe, track, playlist, index,
-                                        len(tracks))
+                    action = _run_track(pipe, track, index, len(tracks))
             except youtube.YouTubeError as exc:
                 _report_stream_error(exc)
                 index += 1
@@ -95,10 +93,10 @@ def _report_stream_error(exc: youtube.YouTubeError) -> None:
         print(colors.dim(f"  {exc.hint}"))
 
 
-def _run_track(pipe: "Pipeline", track: dict, playlist: dict,
+def _run_track(pipe: "Pipeline", track: dict,
                index: int, total: int) -> str:
     """Handle keys for one track; return "next", "prev", or "quit"."""
-    _draw(pipe, track, playlist, index, total)
+    _draw(pipe, track, index, total)
     last_draw = 0.0
 
     while True:
@@ -106,7 +104,7 @@ def _run_track(pipe: "Pipeline", track: dict, playlist: dict,
             return "next"
         now = time.monotonic()
         if now - last_draw >= 1.0:
-            _draw(pipe, track, playlist, index, total)
+            _draw(pipe, track, index, total)
             last_draw = now
         key = _read_key(timeout=POLL_INTERVAL)
         if key is None:
@@ -130,7 +128,7 @@ def _run_track(pipe: "Pipeline", track: dict, playlist: dict,
         elif key == "m":
             pipe.mpv.toggle_mute()
         if key in (" ", "9", "0", "m", "left", "right"):
-            _draw(pipe, track, playlist, index, total)
+            _draw(pipe, track, index, total)
             last_draw = time.monotonic()
 
 
@@ -329,8 +327,7 @@ def _format_time(seconds) -> str:
     return f"{whole // 60:02d}:{whole % 60:02d}"
 
 
-def _draw(pipe: Pipeline, track: dict, playlist: dict,
-          index: int, total: int) -> None:
+def _draw(pipe: Pipeline, track: dict, index: int, total: int) -> None:
     """Redraw the single-line status display.
 
     Properties may be unavailable for piped streams (see module docstring);
@@ -341,17 +338,12 @@ def _draw(pipe: Pipeline, track: dict, playlist: dict,
     """
     mpv = pipe.mpv
     paused = bool(mpv.get_property("pause"))
-    muted = bool(mpv.get_property("mute"))
-    volume = mpv.get_property("volume")
     position = _format_time(mpv.get_property("time-pos"))
     duration = _format_time(mpv.get_property("duration"))
     state = colors.warn("paused") if paused else colors.success("playing")
-    vol = "muted" if muted else f"{round(volume)}%" if volume is not None else "--"
     line = (
         f"\r\x1b[K{state} | {colors.dim(position)}/{colors.dim(duration)} | "
         f"{colors.dim(f'{index + 1}/{total}')} | "
-        f"{colors.bold(track['title'][:45])} | "
-        f"{colors.dim(track.get('channel', '')[:25])} | "
-        f"{colors.accent(playlist['name'][:25])} | {colors.dim(f'vol {vol}')}"
+        f"{colors.bold(track['title'][:45])}"
     )
     print(line, end="", flush=True)
