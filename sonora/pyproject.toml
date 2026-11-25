@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sonora"
+version = "1.0.1"
+description = "A lightweight command-line YouTube playlist audio player"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+keywords = ["youtube", "playlist", "audio", "player", "mpv", "yt-dlp"]
+classifiers = [
+    "Environment :: Console",
+    "Intended Audience :: End Users/Desktop",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Topic :: Multimedia :: Sound/Audio :: Players",
+]
+
+[project.scripts]
+sonora = "sonora.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
